@@ -40,11 +40,11 @@ def get_current_pricing():
         JOIN Charger_Schedule_Assignment csa ON fc.charger_id = csa.charger_id
         JOIN Pricing_Schedules ps ON csa.schedule_id = ps.schedule_id
         JOIN Time_Slots ts ON ps.schedule_id = ts.schedule_id
-        WHERE %s BETWEEN ts.start_time AND ts.end_time;
+        WHERE %s >= ts.start_time AND %s < ts.end_time;
     """
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    cursor.execute(query, (charger_id, time))
+    cursor.execute(query, (charger_id, time,time))
     pricing_info = cursor.fetchall()
     cursor.close()
     conn.close()
