@@ -72,19 +72,24 @@ def update_schedule(charger_id):
     if not schedule_id:
         return jsonify({'error': 'Missing schedule ID'}), 400
 
-    query = """
-        UPDATE Charger_Schedule_Assignment 
-        SET schedule_id = %s 
-        WHERE charger_id = %s;
-    """
+    try:
+        query = """
+            UPDATE Charger_Schedule_Assignment 
+            SET schedule_id = %s 
+            WHERE charger_id = %s;
+        """
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(query, (schedule_id,charger_id))
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, (schedule_id,charger_id))
+
+        conn.commit()
+    except Exception as e:
+        cursor.execute("ROLLBACK")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
     return jsonify({'message': 'Schedule updated successfully.'}), 200
 
@@ -104,24 +109,28 @@ def update_price(schedule_id):
     if not start_time or not end_time or price_per_kwh is None:
         return jsonify({'error': 'Missing required fields'}), 400
 
-    query = """
-        UPDATE time_slots 
-        SET price_per_kwh = %s 
-        WHERE schedule_id = %s AND start_time = %s AND end_time = %s;
-    """
+    try:
+        query = """
+            UPDATE time_slots 
+            SET price_per_kwh = %s 
+            WHERE schedule_id = %s AND start_time = %s AND end_time = %s;
+        """
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute(query, (price_per_kwh, schedule_id, start_time, end_time))
-    
-    conn.commit()
-    
-    if cursor.rowcount == 0:
-        return jsonify({'error': 'No matching time slot found.'}), 404
-    
-    cursor.close()
-    conn.close()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(query, (price_per_kwh, schedule_id, start_time, end_time))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'No matching time slot found.'}), 404
+    except Exception as e:
+        cursor.execute("ROLLBACK")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
     return jsonify({'message': 'Price updated successfully.'}), 200
 
