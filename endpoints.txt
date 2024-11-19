@@ -1,0 +1,151 @@
+Endpoints:
+- /api/v1/pricing/current                 ['GET']    - gets price for a charger id and time
+- /api/v1/pricing/<int:schedule_id>       ['PATCH']  - updates the price of only one time bin of a certain schedule
+
+- /api/v1/schedules/<string:charger_id>   ['PUT']    - updates the schedule for a charger id to a new schedule id
+- /api/v1/schedules/<int:schedule_id>     ['DELETE'] - deletes a schedule, its relations and time bins
+- /api/v1/schedules                       ['POST']   - adds a new schedule with respective time bins
+
+
+
+Response/ Request Contracts:
+
+------------------------------------------------------------
+Gets price for a charger id and time, ignoring schedule active column for now
+------------------------------------------------------------
+- /api/v1/pricing/current                 ['GET']
+
+Request:
+Query Parameters:
+    charger_id (required): Integer
+    time (required): String (format: "HH:MM")
+
+Response:
+    Status Code: 200 OK
+Body:
+[
+  {
+    "charger_id": Integer,
+    "start_time": String,
+    "end_time": String,
+    "price_per_kwh": Float
+  }
+]
+
+Error Code 400:
+{
+  "error": "Missing required parameters"
+}
+
+------------------------------------------------------------
+Updates the price of only one time bin of a certain schedule
+------------------------------------------------------------
+- /api/v1/pricing/<int:schedule_id>       ['PATCH']
+Path Parameter:
+    schedule_id: Integer
+Body:
+{
+  "start_time": String,
+  "end_time": String,
+  "price_per_kwh": Float
+}
+
+Respone:
+Status Code: 200 OK
+{
+  "message": "Price updated successfully."
+}
+Error Response 400:
+{
+  "error": "Missing required fields"
+}
+Error Response 404:
+{
+  "error": "No matching time slot found."
+}
+Error Response 500:
+{
+  "error": "internal server error"
+}
+
+
+------------------------------------------------------------
+Updates the schedule for a charger id to a new schedule id, ignoring times for now
+------------------------------------------------------------
+- /api/v1/schedules/<int:charger_id>   ['PUT']
+Request:
+Path Parameter:
+    charger_id: int
+Body:
+{
+  "schedule_id": int
+}
+
+Responee:
+Status Code: 200 OK
+Body:
+{
+  "message": "Schedule updated successfully."
+}
+Error Response (400 Bad Request):
+{
+  "error": "Missing schedule ID"
+}
+
+------------------------------------------------------------
+Deletes a schedule, its relations and time bins
+------------------------------------------------------------
+- /api/v1/schedules/<int:schedule_id>     ['DELETE'] 
+
+Request:
+Path Parameter:
+    schedule_id: Integer
+
+Response:
+Status Code: 200 OK
+{
+  "message": "Schedule deleted successfully."
+}
+Error Response (404 Not Found):
+{
+  "error": "No schedule found to delete."
+}
+Error Response (500 Internal Server Error):
+{
+  "error": "internal server error"
+}
+
+------------------------------------------------------------
+Adds a new schedule with respective time bins
+------------------------------------------------------------
+- /api/v1/schedules                       ['POST']
+
+Request:
+Body:
+{
+  "schedule_name": String,
+  "effective_from": String,
+  "effective_to": String,
+  "time_slots": [
+    {
+      "start_time": String,
+      "end_time": String,
+      "price_per_kwh": Float
+    }
+  ]
+}
+
+Response:
+Status Code: 201 Created
+{
+  "message": "Schedule and time slots created successfully.",
+  "schedule_id": Integer
+}
+Error Response (400 Bad Request):
+{
+  "error": "Missing required fields"
+}
+Error Response (500 Internal Server Error):
+{
+  "error": "internal server error"
+}
