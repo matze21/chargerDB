@@ -7,8 +7,6 @@ class PricingSchedule(Base):
 
     schedule_id = Column(Integer, primary_key=True)
     schedule_name = Column(String(100), nullable=False)
-    effective_from = Column(Date, nullable=False)
-    effective_to = Column(Date, nullable=False)
 
     time_slots = relationship("TimeSlot", back_populates="schedule")
     assignments = relationship("ChargerScheduleAssignment", back_populates="schedule")

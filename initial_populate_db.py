@@ -22,24 +22,16 @@ def add_sample_data():
 
         # Create sample Pricing Schedules
         schedule1 = PricingSchedule(
-            schedule_name="Standard Weekday",
-            effective_from=date(2024, 1, 1),
-            effective_to=date(2024, 12, 31)
+            schedule_name="Standard Weekday"
         )
         schedule2 = PricingSchedule(
             schedule_name="Weekend Special",
-            effective_from=date(2024, 1, 1),
-            effective_to=date(2024, 12, 31)
         )
         schedule3 = PricingSchedule(
-            schedule_name="Weekend Special 2",
-            effective_from=date(2024, 1, 1),
-            effective_to=date(2024, 12, 31)
+            schedule_name="Weekend Special 2"
         )
         schedule4 = PricingSchedule(
-            schedule_name="Weekday high season",
-            effective_from=date(2024, 1, 1),
-            effective_to=date(2024, 12, 31)
+            schedule_name="Weekday high season"
         )
         session.add_all([schedule1, schedule2, schedule3, schedule4])
 
@@ -65,7 +57,13 @@ def add_sample_data():
             charger=charger1,
             schedule=schedule1,
             effective_from=date(2024, 1, 1),
-            effective_to=date(2024, 12, 31)
+            effective_to=date(2024, 1, 31)
+        )
+        assignment1 = ChargerScheduleAssignment(
+            charger=charger1,
+            schedule=schedule1,
+            effective_from=date(2024, 1, 31),
+            effective_to=date(2024, 2, 28)
         )
         assignment2 = ChargerScheduleAssignment(
             charger=charger2,

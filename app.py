@@ -56,9 +56,9 @@ def get_current_pricing():
         if 'end_time' in item:
             item['end_time'] = item['end_time'].strftime('%H:%M:%S')
 
-    return jsonify(pricing_info)
+    return pricing_info
 
-@app.route('/api/v1/schedules/<string:charger_id>', methods=['PUT'])
+@app.route('/api/v1/schedules/<int:charger_id>', methods=['PUT'])
 def update_schedule(charger_id):
     """ update schedule of a charger station
         e.g. changing charger 1 to schedule 2
@@ -85,7 +85,7 @@ def update_schedule(charger_id):
 
         conn.commit()
     except Exception as e:
-        cursor.execute("ROLLBACK")
+        conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
@@ -126,7 +126,7 @@ def update_price(schedule_id):
         if cursor.rowcount == 0:
             return jsonify({'error': 'No matching time slot found.'}), 404
     except Exception as e:
-        cursor.execute("ROLLBACK")
+        conn.rollback()
         return jsonify({'error': str(e)}), 500
     finally:
         cursor.close()
@@ -153,7 +153,7 @@ def delete_schedule(schedule_id):
         
         # If no rows were affected, rollback and return an error
         if cursor.rowcount == 0:
-            cursor.execute("ROLLBACK")
+            conn.rollback()
             return jsonify({'error': 'No schedule found to delete.'}), 404
 
         cursor.execute("COMMIT")
@@ -161,7 +161,7 @@ def delete_schedule(schedule_id):
 
     except Exception as e:
         # If any error occurs, rollback the transaction
-        cursor.execute("ROLLBACK")
+        conn.rollback()
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -220,7 +220,7 @@ def create_schedule():
 
     except Exception as e:
         # If any error occurs, rollback the transaction
-        cursor.execute("ROLLBACK")
+        conn.rollback()
         return jsonify({'error': str(e)}), 500
 
     finally:
